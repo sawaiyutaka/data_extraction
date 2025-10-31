@@ -19,8 +19,8 @@ def load_df(path, sheet_name=0):
 
 
 # 例: パスを指定（CSV/ExcelどちらでもOK）
-master_df = load_df(r"/Volumes/Transcend/提供データbackup/20230905_03_大熊彩子_追加/ookuma_20230905.csv")
-subset_df = load_df(r"/Volumes/Pegasus32R8/TTC/2025thesis/before_impute.csv")
+master_df = load_df(r"/PATH/TO/.csv")  # 第4期SDQ:DAと比較
+subset_df = load_df(r"/PATH/TO/.csv")
 # /Volumes/Pegasus32R8/TTC/2025thesis/before_impute.csv
 # /Volumes/Pegasus32R8/TTC/2022base_OC_PLE/180511AB基本セット（CBCL・SDQ・SMFQ）_200720.csv
 # /Volumes/Transcend/data4extraction/NewFolder/output/ookuma_20230905.csv
@@ -60,3 +60,4 @@ diff = diff.reset_index()
 print(diff)
 diff.to_csv("diff_output.csv", index=False)
 print("差分を diff_output.csv に出力しました。")
+
