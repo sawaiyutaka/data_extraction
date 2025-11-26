@@ -23,10 +23,20 @@ from typing import Dict, List, Optional, Tuple
 
 # ==== 設定ここから ======================================================
 # CSVファイルが入っているフォルダを指定してください（例: r"C:\\Users\\user\\Documents\\csv"）
-input_dir = Path(r"E:\黄斑0全層（ILM-RPEBM）")  # ←ここを書き換えてください
+input_dir = Path(r"D:\ttc5oct\oct20251126\乳頭")  # ←ここを書き換えてください
+# "D:\ttc5oct\oct20251126\黄斑1(ILM-NFLGCL)"
+# "D:\ttc5oct\oct20251126\黄斑2(NFLGCL-IPLINL)"
+# "D:\ttc5oct\oct20251126\黄斑3(IPLINL-OPLONL)"
+# "D:\ttc5oct\oct20251126\黄斑4(OPLONL-ISOS)"
+# "D:\ttc5oct\oct20251126\黄斑5(ISOS-RPEBM)"
 
 # 出力するCSVファイル名
-output_csv = Path("etdrs_aggregated.csv")
+output_csv = Path(r"D:\ttc5oct\oct20251126\output20251125\p_aggregated.csv")
+# "D:\ttc5oct\oct20251126\output20251125\m1_ILM-NFLGCL_aggregated.csv"
+# 'D:\ttc5oct\oct20251126\output20251125\m2_NFLGCL-IPLINL_aggregated.csv
+# 'D:\ttc5oct\oct20251126\output20251125\m3_IPLINL-OPLONL_aggregated.csv'
+# "D:\ttc5oct\oct20251126\output20251125\m4_OPLONL-ISOS_aggregated.csv"
+# "D:\ttc5oct\oct20251126\output20251125\m5_ISOS-RPEBM_aggregated.csv"
 # ======================================================================
 
 SECTORS = [
