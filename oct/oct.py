@@ -6,10 +6,10 @@ PyCharm上で直接実行できるようにしたETDRS集計スクリプト。
 Thickness1R / Thickness1L をまとめて1つのCSVに出力します。
 
 出力カラム:
-ID, R-Center, R-Inner_Temporal, R-Inner_Superior, R-Inner_Nasal, R-Inner_Inferior,
-   R-Outer_Temporal, R-Outer_Superior, R-Outer_Nasal, R-Outer_Inferior,
-   L-Center, L-Inner_Temporal, L-Inner_Superior, L-Inner_Nasal, L-Inner_Inferior,
-   L-Outer_Temporal, L-Outer_Superior, L-Outer_Nasal, L-Outer_Inferior
+ID, R_Center, R_Inner_Temporal, R_Inner_Superior, R_Inner_Nasal, R_Inner_Inferior,
+   R_Outer_Temporal, R_Outer_Superior, R_Outer_Nasal, R_Outer_Inferior,
+   L_Center, L_Inner_Temporal, L_Inner_Superior, L_Inner_Nasal, L_Inner_Inferior,
+   L_Outer_Temporal, L_Outer_Superior, L_Outer_Nasal, L_Outer_Inferior
 
 使い方:
 1. PyCharmでこのスクリプトを開く
@@ -23,17 +23,20 @@ from typing import Dict, List, Optional, Tuple
 
 # ==== 設定ここから ======================================================
 # CSVファイルが入っているフォルダを指定してください（例: r"C:\\Users\\user\\Documents\\csv"）
-input_dir = Path(r"D:\ttc5oct\oct20251126\乳頭")  # ←ここを書き換えてください
+input_dir = Path(r"D:\ttc5oct\oct20251126\黄斑5(ISOS-RPEBM)")  # ←ここを書き換えてください
+# "D:\ttc5oct\oct20251126\黄斑0全層（ILM-RPEBM）"
 # "D:\ttc5oct\oct20251126\黄斑1(ILM-NFLGCL)"
 # "D:\ttc5oct\oct20251126\黄斑2(NFLGCL-IPLINL)"
 # "D:\ttc5oct\oct20251126\黄斑3(IPLINL-OPLONL)"
 # "D:\ttc5oct\oct20251126\黄斑4(OPLONL-ISOS)"
 # "D:\ttc5oct\oct20251126\黄斑5(ISOS-RPEBM)"
+# "D:\ttc5oct\oct20251126\乳頭"
 
 # 出力するCSVファイル名
-output_csv = Path(r"D:\ttc5oct\oct20251126\output20251125\p_aggregated.csv")
+output_csv = Path(r"D:\ttc5oct\oct20251126\output20251125\m5_ISOS-RPEBM_aggregated.csv")
+# "D:\ttc5oct\oct20251126\output20251125\m0_ALL-LAYERS_aggregated.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m1_ILM-NFLGCL_aggregated.csv"
-# 'D:\ttc5oct\oct20251126\output20251125\m2_NFLGCL-IPLINL_aggregated.csv
+# 'D:\ttc5oct\oct20251126\output20251125\m2_NFLGCL-IPLINL_aggregated.csv'
 # 'D:\ttc5oct\oct20251126\output20251125\m3_IPLINL-OPLONL_aggregated.csv'
 # "D:\ttc5oct\oct20251126\output20251125\m4_OPLONL-ISOS_aggregated.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m5_ISOS-RPEBM_aggregated.csv"
@@ -53,10 +56,10 @@ SECTORS = [
 
 OUTPUT_COLUMNS = [
     "ID",
-    "R-Center","R-Inner_Temporal","R-Inner_Superior","R-Inner_Nasal","R-Inner_Inferior",
-    "R-Outer_Temporal","R-Outer_Superior","R-Outer_Nasal","R-Outer_Inferior",
-    "L-Center","L-Inner_Temporal","L-Inner_Superior","L-Inner_Nasal","L-Inner_Inferior",
-    "L-Outer_Temporal","L-Outer_Superior","L-Outer_Nasal","L-Outer_Inferior",
+    "R_Center","R_Inner_Temporal","R_Inner_Superior","R_Inner_Nasal","R_Inner_Inferior",
+    "R_Outer_Temporal","R_Outer_Superior","R_Outer_Nasal","R_Outer_Inferior",
+    "L_Center","L_Inner_Temporal","L_Inner_Superior","L_Inner_Nasal","L_Inner_Inferior",
+    "L_Outer_Temporal","L_Outer_Superior","L_Outer_Nasal","L_Outer_Inferior",
 ]
 
 ETDRS_TAG = "<ETDRS>"
@@ -185,8 +188,8 @@ def process_file(path: Path) -> Dict[str, Optional[float]]:
 
     for sec in SECTORS:
         r_val, l_val = etdrs.get(sec, (None, None))
-        key_r = "R-" + sec.replace(" ", "_")
-        key_l = "L-" + sec.replace(" ", "_")
+        key_r = "R_" + sec.replace(" ", "_")
+        key_l = "L_" + sec.replace(" ", "_")
         row_out[key_r] = r_val if has_right else None
         # ここが重要: L行が存在しない場合は L を欠損にする
         row_out[key_l] = l_val if has_left else None

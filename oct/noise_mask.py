@@ -4,13 +4,13 @@
 統合済みETDRS CSVに、ノイズ記録CSVを適用して該当領域を欠損値（空欄）に置き換えるスクリプト。
 
 前提:
-- 統合CSV(例: merged_etdrs.csv) は列に ID, R-*, L-* を持つ（Center / Inner_*, Outer_* を含む）
+- 統合CSV(例: merged_etdrs.csv) は列に ID, R-*, L_* を持つ（Center / Inner_*, Outer_* を含む）
 - ノイズCSVは下記列を持つ:
-  ID, L-Superior, L-Inferior, L-Nasal, L-Temporal, L-Center,
+  ID, L_Superior, L_Inferior, L_Nasal, L_Temporal, L_Center,
       R-Superior, R-Inferior, R-Temporal, R-Nasal, R-Center
 - ノイズCSVで "1" または 全角 "１" が入っている領域を欠損にします（"0" や空欄は無視）。
 - Inferior/Superior/Nasal/Temporal にノイズがある場合、Inner_* と Outer_* の両方を欠損にします。
-  例: L-Inferior=1 → L-Inner_Inferior と L-Outer_Inferior の両方を空欄に。
+  例: L_Inferior=1 → L_Inner_Inferior と L_Outer_Inferior の両方を空欄に。
 
 PyCharmでの使い方:
 1) 下のパス設定を編集
@@ -22,16 +22,20 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 # ===== パス設定 ============================================================
-merged_csv_path = Path(r"D:\ttc5oct\oct20251126\output20251125\m5_ISOS-RPEBM_aggregated.csv")      # ノイズ適用対象
+merged_csv_path = Path(r"D:\ttc5oct\oct20251126\output20251125\m0_ALL-LAYERS_aggregated.csv")      # ノイズ適用対象
+# "D:\ttc5oct\oct20251126\output20251125\m0_ALL-LAYERS_aggregated.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m1_ILM-NFLGCL_aggregated.csv"
+# "D:\ttc5oct\oct20251126\output20251125\m2_NFLGCL-IPLINL_aggregated.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m3_IPLINL-OPLONL_aggregated.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m4_OPLONL-ISOS_aggregated.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m5_ISOS-RPEBM_aggregated.csv"
 
 noise_csv_path  = Path(r"D:\ttc5oct\oct20251126\noise20macula.csv")       # ノイズ記録CSV
 
-output_csv_path = Path(r"D:\ttc5oct\oct20251126\output20251125\m5_ISOS-RPEBM_masked.csv")  # 出力先
+output_csv_path = Path(r"D:\ttc5oct\oct20251126\output20251125\m0_ALL-LAYERS_masked.csv")  # 出力先
+# "D:\ttc5oct\oct20251126\output20251125\m0_ALL-LAYERS_masked.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m1_ILM-NFLGCL_masked.csv"
+# "D:\ttc5oct\oct20251126\output20251125\m2_NFLGCL-IPLINL_masked.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m3_IPLINL-OPLONL_masked.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m4_OPLONL-ISOS_masked.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m5_ISOS-RPEBM_masked.csv"
@@ -41,8 +45,8 @@ ENCODINGS = ("utf-8-sig", "cp932", "utf-8")
 
 NOISE_COLUMNS = [
     "ID",
-    "L-Superior","L-Inferior","L-Nasal","L-Temporal","L-Center",
-    "R-Superior","R-Inferior","R-Temporal","R-Nasal","R-Center",
+    "L_Superior","L_Inferior","L_Nasal","L_Temporal","L_Center",
+    "R_Superior","R_Inferior","R_Temporal","R_Nasal","R_Center",
 ]
 
 # ノイズ → 欠損にする対象列のマッピング
@@ -50,8 +54,8 @@ NOISE_COLUMNS = [
 TARGETS = {}
 for eye in ("L", "R"):
     for quad in ("Superior", "Inferior", "Nasal", "Temporal"):
-        TARGETS[f"{eye}-{quad}"] = [f"{eye}-Inner_{quad}", f"{eye}-Outer_{quad}"]
-    TARGETS[f"{eye}-Center"] = [f"{eye}-Center"]
+        TARGETS[f"{eye}_{quad}"] = [f"{eye}_Inner_{quad}", f"{eye}_Outer_{quad}"]
+    TARGETS[f"{eye}_Center"] = [f"{eye}_Center"]
 
 
 def read_csv_any(path: Path) -> Tuple[List[str], List[List[str]]]:
