@@ -6,8 +6,9 @@ from pathlib import Path
 from collections import defaultdict
 
 # ===== 設定 =====
-INPUT_DIR = Path(r"E:\age_test")   # ← CSVフォルダのパスに変更してください
-OUTPUT_CSV = Path("output_scores.csv")
+INPUT_DIR = Path(r"F:\AGEデータベース作成用")   # ← CSVフォルダのパスに変更してください
+OUTPUT_CSV = Path("age_output.csv")
+INTERMEDIATE_CSV = Path("age_scores_by_id.csv")   # 追加: IDごとのスコア一覧
 
 # ===== ユーティリティ =====
 def to_float_safe(s):
@@ -134,6 +135,21 @@ if invalid_id_files:
     for bad_id in sorted(invalid_id_files.keys()):
         files = ", ".join(sorted(invalid_id_files[bad_id]))
         print(f"  - ID: {bad_id} | ファイル: {files}")
+
+
+# ===== 中間CSV出力（有効IDごとのスコア一覧） =====
+INTERMEDIATE_CSV.parent.mkdir(parents=True, exist_ok=True)
+
+with open(INTERMEDIATE_CSV, "w", encoding="cp932", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["ID", "Scores"])
+
+    for valid_id in sorted(scores_by_valid_id.keys()):
+        scores = scores_by_valid_id[valid_id]
+        finite_scores = [v for v in scores if isinstance(v, (int, float)) and math.isfinite(v)]
+        writer.writerow([valid_id, str(finite_scores)])
+
+print(f"[中間出力] IDごとのスコア一覧: {INTERMEDIATE_CSV.resolve()}")
 
 # ===== スコア集計（有効IDのみ） =====
 result_rows = []
