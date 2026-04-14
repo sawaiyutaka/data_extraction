@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 # ===== パス設定 ============================================================
-merged_csv_path = Path(r"D:\ttc5oct\oct20251126\output20251125\m0_ALL-LAYERS_aggregated.csv")      # ノイズ適用対象
+merged_csv_path = Path(r"D:\ttc5oct\oct20251126\output20251125\m4_OPLONL-ISOS_aggregated.csv")      # ノイズ適用対象
 # "D:\ttc5oct\oct20251126\output20251125\m0_ALL-LAYERS_aggregated.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m1_ILM-NFLGCL_aggregated.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m2_NFLGCL-IPLINL_aggregated.csv"
@@ -32,7 +32,7 @@ merged_csv_path = Path(r"D:\ttc5oct\oct20251126\output20251125\m0_ALL-LAYERS_agg
 
 noise_csv_path  = Path(r"D:\ttc5oct\oct20251126\noise20macula.csv")       # ノイズ記録CSV
 
-output_csv_path = Path(r"D:\ttc5oct\oct20251126\output20251125\m0_ALL-LAYERS_masked.csv")  # 出力先
+output_csv_path = Path(r"D:\ttc5oct\oct20251126\output20251125\m4_OPLONL-ISOS_masked.csv")  # 出力先
 # "D:\ttc5oct\oct20251126\output20251125\m0_ALL-LAYERS_masked.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m1_ILM-NFLGCL_masked.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m2_NFLGCL-IPLINL_masked.csv"

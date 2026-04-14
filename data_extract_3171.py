@@ -129,11 +129,11 @@ def select_columns_exact(df: pd.DataFrame, names: list[str]) -> pd.DataFrame:
 
 def main():
     # 1) 項目名の読み込み（縦並び→横並び=リスト）
-    items = normalize_items_from_text(ITEMS_FILE)  # ← 変更: テキスト→リスト
+    items = normalize_items_from_text(ITEMS_FILE)
     print(f'項目（{len(items)}件）: {items[:15]}{" ..." if len(items) > 15 else ""}')
 
     # 2) 追加入力（任意）
-    items = maybe_extend_with_manual_input(items)  # ← 変更: 追加入力サポート
+    items = maybe_extend_with_manual_input(items)
     print(f'最終項目リスト（{len(items)}件）')
 
     # 3) ファイル収集
@@ -144,25 +144,45 @@ def main():
 
     # 4) 読み込み
     dfs = []
+    ec_indexes = []  # ← 追加: ec系CSVのインデックスを集める
     for p in csv_files:
         print(f'[CSV] 読み込み: {p}')
-        dfs.append(read_csv_file(p, INDEX_COL))
+        df_i = read_csv_file(p, INDEX_COL)
+        dfs.append(df_i)
+        if p.name.lower().startswith('ec'):           # ← 追加: 先頭ec判定（小文字化で安全に）
+            ec_indexes.append(df_i.index)             # ← 追加
+
     for p in xls_files:
         print(f'[XLS] 読み込み: {p}')
         dfs.append(read_excel_file(p, INDEX_COL))
 
     # 5) 結合（INDEX_COL基準で外部結合）
     df = pd.concat(dfs, axis=1, join='outer')
-    # 重複列は先勝ちで落とす
-    df = df.loc[:, ~df.columns.duplicated()]  # ← 変更
+    df = df.loc[:, ~df.columns.duplicated()]
     print(f'結合後サイズ: {df.shape[0]}行 × {df.shape[1]}列')
+
+    # 5.5) ec_n2113_PIなし.xlsx に含まれるSAMPLENUMBERのみ残す ←★ 追加部分
+    filter_file = Path(r"D:\ttc_data_extract\dc_n3171.xlsx")
+
+    if filter_file.exists():
+        try:
+            filter_df = pd.read_excel(filter_file, dtype=str)
+            if INDEX_COL not in filter_df.columns:
+                raise KeyError(f"指定ファイルに '{INDEX_COL}' 列が見つかりません。")
+            valid_ids = set(filter_df[INDEX_COL].dropna())
+            df = df.loc[df.index.intersection(valid_ids)]
+            print(f"[フィルタ] dc_n3171 に含まれる {len(valid_ids)} 件の {INDEX_COL} に絞り込みました。")
+        except Exception as e:
+            print(f"[警告] フィルタファイルの読み込みに失敗しました: {e}")
+    else:
+        print("[警告] フィルタ用ファイルが存在しません。全データを使用します。")
 
     # 6) 列抽出（完全一致）
     result = select_columns_exact(df, items)
     print(f'抽出後サイズ: {result.shape[0]}行 × {result.shape[1]}列')
 
     # 7) 出力
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)  # ← 変更: 出力フォルダ自動作成
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     result.to_csv(OUTPUT, encoding='utf-8', index=True)
     print(f'→ 出力: {OUTPUT}')
 
