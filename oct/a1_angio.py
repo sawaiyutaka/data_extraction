@@ -33,7 +33,7 @@ from typing import Dict, List, Optional
 input_dir = Path(r"G:\アンギオデータベース作成用\アンギオ")  # ←ここを書き換えてください
 
 # 出力するCSVファイル名
-output_csv = Path(r"G:\アンギオデータベース作成用\アンギオ\vd_aggregated_merged.csv")
+output_csv = Path(r"G:\アンギオデータベース作成用\vd_aggregated_merged.csv")
 # ======================================================================
 
 # 9セクタ

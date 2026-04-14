@@ -22,23 +22,27 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 # ===== パス設定 ============================================================
-merged_csv_path = Path(r"D:\ttc5oct\oct20251126\output20251125\m4_OPLONL-ISOS_aggregated.csv")      # ノイズ適用対象
+merged_csv_path = Path(r"G:\アンギオデータベース作成用\vd_aggregated_merged.csv")      # ノイズ適用対象
 # "D:\ttc5oct\oct20251126\output20251125\m0_ALL-LAYERS_aggregated.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m1_ILM-NFLGCL_aggregated.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m2_NFLGCL-IPLINL_aggregated.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m3_IPLINL-OPLONL_aggregated.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m4_OPLONL-ISOS_aggregated.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m5_ISOS-RPEBM_aggregated.csv"
+# "G:\アンギオデータベース作成用\vd_aggregated_merged.csv"
 
-noise_csv_path  = Path(r"D:\ttc5oct\oct20251126\noise20macula.csv")       # ノイズ記録CSV
+noise_csv_path  = Path(r"G:\アンギオデータベース作成用\error_map_contains1.csv")       # ノイズ記録CSV
+# "G:\黄斑データベース作成用\noise20macula.csv" 黄斑
+# "G:\アンギオデータベース作成用\error_map_contains1.csv" アンギオ
 
-output_csv_path = Path(r"D:\ttc5oct\oct20251126\output20251125\m4_OPLONL-ISOS_masked.csv")  # 出力先
+output_csv_path = Path(r"G:\アンギオデータベース作成用\angio_vd_masked.csv")  # 出力先
 # "D:\ttc5oct\oct20251126\output20251125\m0_ALL-LAYERS_masked.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m1_ILM-NFLGCL_masked.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m2_NFLGCL-IPLINL_masked.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m3_IPLINL-OPLONL_masked.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m4_OPLONL-ISOS_masked.csv"
 # "D:\ttc5oct\oct20251126\output20251125\m5_ISOS-RPEBM_masked.csv"
+# "G:\アンギオデータベース作成用\angio_vd_masked.csv"
 # ==========================================================================
 
 ENCODINGS = ("utf-8-sig", "cp932", "utf-8")

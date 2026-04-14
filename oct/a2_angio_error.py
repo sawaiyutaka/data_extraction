@@ -6,7 +6,6 @@
 ETDRS 9セクタ形式に展開し、
 
 (1) 「1 を含むものだけ 1（それ以外は空欄）」 → *_contains1.csv
-(2) 「2 または 9 を含むものだけ 1（それ以外は空欄）」 → *_contains2or9.csv
 
 として出力するスクリプト。
 
@@ -24,13 +23,10 @@ from typing import Dict, List, Optional
 # ==== 設定ここから ======================================================
 
 # 入力CSVのパス
-input_csv = Path(r"D:\ttc5oct\oct20251126\noise20angio.csv")  # ←ここを書き換えてください
+input_csv = Path(r"G:\アンギオデータベース作成用\oct20angio_noise.csv")  # ←ここを書き換えてください
 
 # 出力CSV（① 1を含むものだけ1）
-output_csv_contains1 = Path(r"D:\ttc5oct\oct20251126\error_map_contains1.csv")
-
-# 出力CSV（② 2または9を含むものだけ1）
-output_csv_contains2or9 = Path(r"D:\ttc5oct\oct20251126\error_map_contains2or9.csv")
+output_csv_contains1 = Path(r"G:\アンギオデータベース作成用\error_map_contains1.csv")
 
 # ======================================================================
 
@@ -168,18 +164,6 @@ def contains1(value: Optional[str]) -> str:
     return "1" if "1" in s else ""
 
 
-def contains2or9(value: Optional[str]) -> str:
-    """
-    「2 または 9 を含む（'2', '9', '12', '19', '29' など）ものだけ 1、それ以外は空欄」
-    """
-    if value is None:
-        return ""
-    s = str(value).strip()
-    if not s:
-        return ""
-    return "1" if ("2" in s or "9" in s) else ""
-
-
 def main():
     if not input_csv.exists():
         print(f"Error: 入力CSVが見つかりません → {input_csv}")
@@ -195,9 +179,8 @@ def main():
         expand_to_etdrs_cells(r) for r in raw_rows
     ]
 
-    # ② contains1 / contains2or9 を適用して2種類の結果を作る
+    # ② contains1を適用して結果を作る
     rows_contains1: List[Dict[str, str]] = []
-    rows_contains2or9: List[Dict[str, str]] = []
 
     for ex in expanded_rows:
         row1: Dict[str, str] = {}
@@ -205,16 +188,15 @@ def main():
         for col in OUTPUT_COLUMNS:
             if col == "ID":
                 row1["ID"] = ex.get("ID") or ""
-                row2["ID"] = ex.get("ID") or ""
+
             else:
                 row1[col] = contains1(ex.get(col))
-                row2[col] = contains2or9(ex.get(col))
+
         rows_contains1.append(row1)
-        rows_contains2or9.append(row2)
 
     # 出力フォルダ作成
     output_csv_contains1.parent.mkdir(parents=True, exist_ok=True)
-    output_csv_contains2or9.parent.mkdir(parents=True, exist_ok=True)
+
 
     # _contains1 を書き出し
     with output_csv_contains1.open("w", encoding="utf-8", newline="") as f:
@@ -222,15 +204,9 @@ def main():
         writer.writeheader()
         writer.writerows(rows_contains1)
 
-    # _contains2or9 を書き出し
-    with output_csv_contains2or9.open("w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=OUTPUT_COLUMNS)
-        writer.writeheader()
-        writer.writerows(rows_contains2or9)
 
     print(f"完了: {len(expanded_rows)} 件を処理しました")
     print(f"  ・1を含むものだけ1 → {output_csv_contains1}")
-    print(f"  ・2または9を含むものだけ1 → {output_csv_contains2or9}")
 
 
 if __name__ == "__main__":
