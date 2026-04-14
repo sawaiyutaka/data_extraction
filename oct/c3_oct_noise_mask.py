@@ -31,9 +31,9 @@ merged_csv_path = Path(r"G:\アンギオデータベース作成用\vd_aggregate
 # "D:\ttc5oct\oct20251126\output20251125\m5_ISOS-RPEBM_aggregated.csv"
 # "G:\アンギオデータベース作成用\vd_aggregated_merged.csv"
 
-noise_csv_path  = Path(r"G:\アンギオデータベース作成用\error_map_contains1.csv")       # ノイズ記録CSV
+noise_csv_path  = Path(r"G:\アンギオデータベース作成用\oct20angio_noise.csv")       # ノイズ記録CSV 5領域でOK
 # "G:\黄斑データベース作成用\noise20macula.csv" 黄斑
-# "G:\アンギオデータベース作成用\error_map_contains1.csv" アンギオ
+# "G:\アンギオデータベース作成用\oct20angio_noise.csv" アンギオ
 
 output_csv_path = Path(r"G:\アンギオデータベース作成用\angio_vd_masked.csv")  # 出力先
 # "D:\ttc5oct\oct20251126\output20251125\m0_ALL-LAYERS_masked.csv"
