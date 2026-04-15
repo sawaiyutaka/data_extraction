@@ -22,27 +22,22 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 # ===== パス設定 ============================================================
-merged_csv_path = Path(r"G:\アンギオデータベース作成用\vd_aggregated_merged.csv")      # ノイズ適用対象
-# "D:\ttc5oct\oct20251126\output20251125\m0_ALL-LAYERS_aggregated.csv"
-# "D:\ttc5oct\oct20251126\output20251125\m1_ILM-NFLGCL_aggregated.csv"
-# "D:\ttc5oct\oct20251126\output20251125\m2_NFLGCL-IPLINL_aggregated.csv"
-# "D:\ttc5oct\oct20251126\output20251125\m3_IPLINL-OPLONL_aggregated.csv"
-# "D:\ttc5oct\oct20251126\output20251125\m4_OPLONL-ISOS_aggregated.csv"
-# "D:\ttc5oct\oct20251126\output20251125\m5_ISOS-RPEBM_aggregated.csv"
-# "G:\アンギオデータベース作成用\vd_aggregated_merged.csv"
+merged_csv_path = Path(r"D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m5_ISOS-RPEBM_aggregated.csv")      # ノイズ適用対象
+# "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m1_ILM-NFLGCL_aggregated.csv"
+# "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m2_NFLGCL-IPLINL_aggregated.csv"
+# "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m3_IPLINL-OPLONL_aggregated.csv"
+# "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m4_OPLONL-ISOS_aggregated.csv"
+# "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m5_ISOS-RPEBM_aggregated.csv"
 
-noise_csv_path  = Path(r"G:\アンギオデータベース作成用\oct20angio_noise.csv")       # ノイズ記録CSV 5領域でOK
-# "G:\黄斑データベース作成用\noise20macula.csv" 黄斑
-# "G:\アンギオデータベース作成用\oct20angio_noise.csv" アンギオ
+noise_csv_path  = Path(r"D:\ttc5oct\oct20251126\noise20macula251125.csv")       # ノイズ記録CSV 5領域でOK
+#
 
-output_csv_path = Path(r"G:\アンギオデータベース作成用\angio_vd_masked.csv")  # 出力先
-# "D:\ttc5oct\oct20251126\output20251125\m0_ALL-LAYERS_masked.csv"
-# "D:\ttc5oct\oct20251126\output20251125\m1_ILM-NFLGCL_masked.csv"
-# "D:\ttc5oct\oct20251126\output20251125\m2_NFLGCL-IPLINL_masked.csv"
-# "D:\ttc5oct\oct20251126\output20251125\m3_IPLINL-OPLONL_masked.csv"
-# "D:\ttc5oct\oct20251126\output20251125\m4_OPLONL-ISOS_masked.csv"
-# "D:\ttc5oct\oct20251126\output20251125\m5_ISOS-RPEBM_masked.csv"
-# "G:\アンギオデータベース作成用\angio_vd_masked.csv"
+output_csv_path = Path(r"D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m5_ISOS-RPEBM_OPLONL-ISOS_masked.csv")  # 出力先
+# "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m1_ILM-NFLGCL_masked.csv"
+# "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m2_NFLGCL-IPLINL_masked.csv"
+# "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m3_IPLINL-OPLONL_masked.csv"
+# "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m4_OPLONL-ISOS_masked.csv"
+# "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m5_ISOS-RPEBM_OPLONL-ISOS_masked.csv"
 # ==========================================================================
 
 ENCODINGS = ("utf-8-sig", "cp932", "utf-8")
