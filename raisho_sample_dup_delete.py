@@ -3,14 +3,14 @@ import pandas as pd
 # ===== ファイル =====
 a_csv = r"C:\Users\sawai\PycharmProjects\data_extraction\raisho_id_no_dup.csv"  # 重複を削除した来所IDリスト
 
-b_csv = r"D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\faz_aggregated_merged.csv"  # 来所型IDのみのデータセット
+b_csv = r"D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\faz_masked.csv"  # 来所型IDのみのデータセット
 # "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m1_ILM-NFLGCL_masked.csv"
 # "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m2_NFLGCL-IPLINL_masked.csv"
 # "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m3_IPLINL-OPLONL_masked.csv"
 # "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m4_OPLONL-ISOS_masked.csv"
 # "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m5_ISOS-RPEBM_OPLONL-ISOS_masked.csv"
 # "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\angio_vd_masked.csv"
-# "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\faz_aggregated_merged.csv"
+# "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\faz_masked.csv"
 
 output_csv = r"D:\ttc5oct\データセット作成用20260415\angio_faz_no_dup.csv"
 # "D:\ttc5oct\データセット作成用20260415\m0_ALL-LAYERS_no_dup.csv"
