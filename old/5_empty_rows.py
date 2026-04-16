@@ -1,7 +1,7 @@
 import pandas as pd
 
 # ===== 設定 =====
-input_xlsx = r"G:\ttc6sawai\ee_n1754_251029.xlsx"
+input_xlsx = r"D:\ttc_data_extract\ee_n3171.xlsx"
 output_csv = "empty_rows_EE.csv"
 
 # ===== 読み込み =====
