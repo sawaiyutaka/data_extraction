@@ -27,7 +27,7 @@ df_a = pd.read_csv(a_csv, header=None, dtype=str)
 df_b = pd.read_csv(b_csv, header=None, dtype=str)
 
 # 列名設定
-df_a.columns = ["ID", "SAMPLENUMCER"]
+df_a.columns = ["ID", "SAMPLENUMBER"]
 # Bは列数不明なので1列目だけ名前付け
 df_b = df_b.rename(columns={0: "ID"})
 
@@ -36,6 +36,9 @@ df_b_filtered = df_b[df_b["ID"].isin(df_a["ID"])].copy()
 
 # ===== サンプルナンバーを結合 =====
 df_merged = df_b_filtered.merge(df_a, on="ID", how="left")
+
+# ===== 列順変更（SAMPLENUMBERを先頭に）=====
+df_merged = df_merged[["SAMPLENUMBER", "ID"] + [col for col in df_merged.columns if col not in ["SAMPLENUMBER", "ID"]]]
 
 # ===== 保存 =====
 df_merged.to_csv(output_csv, index=False, header=False, encoding="utf-8-sig")
