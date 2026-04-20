@@ -16,7 +16,7 @@ XLS_GLOB = '*.xls*'
 # 結合のキー
 INDEX_COL = 'SAMPLENUMBER'
 # 出力
-OUTPUT = Path(r"D:\ttc_data_extract\output\uno_260314.csv")
+OUTPUT = Path(r"D:\ttc_data_extract\output\ファイル名をここに入れる.csv")
 
 
 # ===== ヘルパ =====
