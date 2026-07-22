@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import statsmodels.api as sm
+from scipy.stats import chi2
 
 # ============================================================
 # ファイル設定
@@ -32,6 +33,7 @@ category_summary_output = (
 )
 
 exposure = "care_labor_total"
+covariate = "smfq_10"
 
 # ケア労働志向性の計算に使用する項目
 item_variables = [
@@ -402,10 +404,9 @@ df[
 
 # ============================================================
 # 線形回帰
-# care_labor_total → 年齢別SMFQ
+# care_labor_total → 12歳以降のSMFQ（10歳時SMFQで調整）
 # ============================================================
 linear_outcomes = [
-    "smfq_10",
     "smfq_12",
     "smfq_14",
     "smfq_16"
@@ -425,7 +426,7 @@ for sex_group, group_df in analysis_groups:
 
         # モデルごとのlistwise deletion
         model_data = (
-            group_df[[exposure, outcome]]
+            group_df[[exposure, covariate, outcome]]
             .dropna()
             .copy()
         )
@@ -433,10 +434,11 @@ for sex_group, group_df in analysis_groups:
         if (
             len(model_data) >= 3
             and model_data[exposure].nunique() >= 2
+            and model_data[covariate].nunique() >= 2
             and model_data[outcome].nunique() >= 2
         ):
             X = sm.add_constant(
-                model_data[[exposure]],
+                model_data[[exposure, covariate]],
                 has_constant="add"
             )
 
@@ -450,6 +452,7 @@ for sex_group, group_df in analysis_groups:
                 "TTC_sex": sex_group,
                 "Outcome": outcome,
                 "Exposure": exposure,
+                "Adjusted_for": covariate,
                 "N": int(model.nobs),
                 "Outcome_mean": y.mean(),
                 "Outcome_SD": y.std(ddof=1),
@@ -468,6 +471,7 @@ for sex_group, group_df in analysis_groups:
                 "TTC_sex": sex_group,
                 "Outcome": outcome,
                 "Exposure": exposure,
+                "Adjusted_for": covariate,
                 "N": len(model_data),
                 "Outcome_mean": model_data[outcome].mean(),
                 "Outcome_SD": model_data[outcome].std(ddof=1),
@@ -492,6 +496,7 @@ linear_results_df.to_csv(
 # ============================================================
 # ロジスティック回帰
 # care_labor_total → 20歳時点の各二値アウトカム
+# 10歳時SMFQで調整
 # ============================================================
 logistic_outcomes = [
     "suicidal_ideation",
@@ -506,7 +511,7 @@ for sex_group, group_df in analysis_groups:
 
         # モデルごとのlistwise deletion
         model_data = (
-            group_df[[exposure, outcome]]
+            group_df[[exposure, covariate, outcome]]
             .dropna()
             .copy()
         )
@@ -523,12 +528,13 @@ for sex_group, group_df in analysis_groups:
         can_fit = (
             len(model_data) >= 3
             and model_data[exposure].nunique() >= 2
+            and model_data[covariate].nunique() >= 2
             and model_data[outcome].nunique() == 2
         )
 
         if can_fit:
             X = sm.add_constant(
-                model_data[[exposure]],
+                model_data[[exposure, covariate]],
                 has_constant="add"
             )
 
@@ -544,6 +550,7 @@ for sex_group, group_df in analysis_groups:
                     "TTC_sex": sex_group,
                     "Outcome": outcome,
                     "Exposure": exposure,
+                    "Adjusted_for": covariate,
                     "N": int(model.nobs),
                     "Event_N": event_n,
                     "Non_event_N": non_event_n,
@@ -568,6 +575,7 @@ for sex_group, group_df in analysis_groups:
                     "TTC_sex": sex_group,
                     "Outcome": outcome,
                     "Exposure": exposure,
+                    "Adjusted_for": covariate,
                     "N": len(model_data),
                     "Event_N": event_n,
                     "Non_event_N": non_event_n,
@@ -590,6 +598,7 @@ for sex_group, group_df in analysis_groups:
                 "TTC_sex": sex_group,
                 "Outcome": outcome,
                 "Exposure": exposure,
+                "Adjusted_for": covariate,
                 "N": len(model_data),
                 "Event_N": event_n,
                 "Non_event_N": non_event_n,
@@ -644,13 +653,19 @@ for sex_group, group_df in analysis_groups:
             })
 
         for outcome in linear_outcomes:
-            model_data = group_df[[category_variable, outcome]].dropna().copy()
+            model_data = group_df[
+                [category_variable, covariate, outcome]
+            ].dropna().copy()
             observed_categories = [
                 str(x) for x in model_data[category_variable]
                 .cat.remove_unused_categories().cat.categories
             ]
 
-            if len(model_data) >= 3 and len(observed_categories) >= 2:
+            if (
+                len(model_data) >= 3
+                and len(observed_categories) >= 2
+                and model_data[covariate].nunique() >= 2
+            ):
                 # drop_first=Trueにより最低群Q1をreferenceにする
                 dummy = pd.get_dummies(
                     model_data[category_variable].cat.remove_unused_categories(),
@@ -658,7 +673,11 @@ for sex_group, group_df in analysis_groups:
                     drop_first=True,
                     dtype=float
                 )
-                X = sm.add_constant(dummy, has_constant="add")
+                X = pd.concat(
+                    [model_data[[covariate]], dummy],
+                    axis=1
+                )
+                X = sm.add_constant(X, has_constant="add")
                 y = model_data[outcome]
 
                 try:
@@ -677,6 +696,7 @@ for sex_group, group_df in analysis_groups:
                             "Outcome": outcome,
                             "Division": n_groups,
                             "Exposure": category_variable,
+                            "Adjusted_for": covariate,
                             "Reference": observed_categories[0],
                             "Comparison": comparison,
                             "N": int(model.nobs),
@@ -695,7 +715,9 @@ for sex_group, group_df in analysis_groups:
                     )
 
         for outcome in logistic_outcomes:
-            model_data = group_df[[category_variable, outcome]].dropna().copy()
+            model_data = group_df[
+                [category_variable, covariate, outcome]
+            ].dropna().copy()
             observed_categories = [
                 str(x) for x in model_data[category_variable]
                 .cat.remove_unused_categories().cat.categories
@@ -706,6 +728,7 @@ for sex_group, group_df in analysis_groups:
             can_fit = (
                 len(model_data) >= 3
                 and len(observed_categories) >= 2
+                and model_data[covariate].nunique() >= 2
                 and model_data[outcome].nunique() == 2
             )
 
@@ -716,11 +739,29 @@ for sex_group, group_df in analysis_groups:
                     drop_first=True,
                     dtype=float
                 )
-                X = sm.add_constant(dummy, has_constant="add")
+                X = pd.concat(
+                    [model_data[[covariate]], dummy],
+                    axis=1
+                )
+                X = sm.add_constant(X, has_constant="add")
                 y = model_data[outcome].astype(int)
 
                 try:
                     model = sm.Logit(y, X).fit(disp=False)
+
+                    # smfq_10のみを含む縮約モデルと比較し、
+                    # 曝露カテゴリ全体の追加効果を検定する。
+                    reduced_X = sm.add_constant(
+                        model_data[[covariate]],
+                        has_constant="add"
+                    )
+                    reduced_model = sm.Logit(
+                        y, reduced_X
+                    ).fit(disp=False)
+                    lr_stat = 2 * (model.llf - reduced_model.llf)
+                    omnibus_p = float(
+                        chi2.sf(lr_stat, len(dummy.columns))
+                    )
 
                     for column in dummy.columns:
                         comparison = column.replace(
@@ -733,6 +774,7 @@ for sex_group, group_df in analysis_groups:
                             "Outcome": outcome,
                             "Division": n_groups,
                             "Exposure": category_variable,
+                            "Adjusted_for": covariate,
                             "Reference": observed_categories[0],
                             "Comparison": comparison,
                             "N": int(model.nobs),
@@ -742,7 +784,7 @@ for sex_group, group_df in analysis_groups:
                             "OR_95CI_lower": np.exp(conf_int.iloc[0]),
                             "OR_95CI_upper": np.exp(conf_int.iloc[1]),
                             "P_value": model.pvalues[column],
-                            "Omnibus_P_value": model.llr_pvalue,
+                            "Omnibus_P_value": omnibus_p,
                             "Converged": model.mle_retvals["converged"]
                         })
                 except Exception as error:
