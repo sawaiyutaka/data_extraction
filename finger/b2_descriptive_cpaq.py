@@ -62,7 +62,7 @@ for item in item_variables:
     df.loc[~df[item].isin([1, 2, 3, 4]), item] = np.nan
 
 # ============================================================
-# CPAQ feminine得点の計算
+# CPAQ feminineの一部の得点から「ケア労働志向性」の計算
 # ============================================================
 # 5項目すべてに回答があるか
 complete_response = df[item_variables].notna().all(axis=1)
