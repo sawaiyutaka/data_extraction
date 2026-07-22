@@ -1,9 +1,9 @@
 import pandas as pd
-
+# 来所型IDとサンプルナンバーを結合して、重複・プレ調査を削除
 # ===== ファイル =====
 a_csv = r"C:\Users\sawai\PycharmProjects\data_extraction\raisho_id_no_dup.csv"  # 重複を削除した来所IDリスト
 
-b_csv = r"D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\faz_masked.csv"  # 来所型IDのみのデータセット
+b_csv = r"C:\Users\sawai\PycharmProjects\data_extraction\inbody\inbody_EG0001_EG0911.csv"  # 来所型IDのみのデータセット
 # "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m1_ILM-NFLGCL_masked.csv"
 # "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m2_NFLGCL-IPLINL_masked.csv"
 # "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m3_IPLINL-OPLONL_masked.csv"
@@ -11,8 +11,9 @@ b_csv = r"D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\faz_mas
 # "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\m5_ISOS-RPEBM_OPLONL-ISOS_masked.csv"
 # "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\angio_vd_masked.csv"
 # "D:\ttc5oct\oct20251126\output20260415_重複_IDエラー修正\faz_masked.csv"
+# "C:\Users\sawai\PycharmProjects\data_extraction\inbody\inbody_EG0001_EG0911.csv"
 
-output_csv = r"D:\ttc5oct\データセット作成用20260415\angio_faz_no_dup.csv"
+output_csv = r"C:\Users\sawai\PycharmProjects\data_extraction\inbody\inbody_no_dup.csv"
 # "D:\ttc5oct\データセット作成用20260415\m0_ALL-LAYERS_no_dup.csv"
 # "D:\ttc5oct\データセット作成用20260415\m1_ILM-NFLGCL_no_dup.csv"
 # "D:\ttc5oct\データセット作成用20260415\m2_NFLGCL-IPLINL_no_dup.csv"
@@ -21,6 +22,7 @@ output_csv = r"D:\ttc5oct\データセット作成用20260415\angio_faz_no_dup.c
 # "D:\ttc5oct\データセット作成用20260415\m5_ISOS-RPEBM_OPLONL-ISOS_no_dup.csv"
 # "D:\ttc5oct\データセット作成用20260415\angio_vd_no_dup.csv"
 # "D:\ttc5oct\データセット作成用20260415\angio_faz_no_dup.csv"
+# "C:\Users\sawai\PycharmProjects\data_extraction\inbody\inbody_no_dup.csv"
 
 # ===== 読み込み（文字コード注意）=====
 df_a = pd.read_csv(a_csv, header=None, dtype=str)
