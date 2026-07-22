@@ -19,6 +19,18 @@ logistic_output = (
     r"D:\ttc2d4d\care_labor_suicidality_logistic_regression.csv"
 )
 
+categorical_linear_output = (
+    r"D:\ttc2d4d\care_labor_category_SMFQ_linear_regression.csv"
+)
+
+categorical_logistic_output = (
+    r"D:\ttc2d4d\care_labor_category_suicidality_logistic_regression.csv"
+)
+
+category_summary_output = (
+    r"D:\ttc2d4d\care_labor_category_summary.csv"
+)
+
 exposure = "care_labor_total"
 
 # ケア労働志向性の計算に使用する項目
@@ -318,6 +330,52 @@ print(
     .T
 )
 
+# ============================================================
+# care_labor_totalを2分位・3分位・4分位でカテゴリ化
+# ============================================================
+# 分位点は全対象者（care_labor_totalが欠損でない人）から算出し、
+# 全体解析とTTC_sex別解析で共通の境界値を使用する。
+def create_quantile_category(series, n_groups):
+    probabilities = np.arange(1, n_groups) / n_groups
+    cut_points = series.dropna().quantile(probabilities).to_numpy()
+
+    if len(np.unique(cut_points)) < len(cut_points):
+        print(
+            f"警告：{n_groups}分割の分位点に同じ値があります。"
+            "得点の同点が多いため、実際の群数を減らして解析します。"
+        )
+
+    # 離散得点では複数の分位点が同値になることがあるため、
+    # 重複する境界を除いてから実際の群数に合わせてラベルを付ける。
+    bins = np.unique([-np.inf, *cut_points, np.inf])
+    actual_n = len(bins) - 1
+    labels = [f"Q{i}" for i in range(1, actual_n + 1)]
+
+    category = pd.cut(
+        series,
+        bins=bins,
+        labels=labels,
+        include_lowest=True,
+        right=True
+    )
+
+    return category, cut_points
+
+
+category_variables = {}
+category_cut_points = {}
+
+for n_groups in [2, 3, 4]:
+    variable_name = f"care_labor_q{n_groups}"
+    df[variable_name], category_cut_points[n_groups] = (
+        create_quantile_category(df[exposure], n_groups)
+    )
+    category_variables[n_groups] = variable_name
+
+    print(f"\n{variable_name}の境界値")
+    print(category_cut_points[n_groups])
+    print(df[variable_name].value_counts(dropna=False).sort_index())
+
 print("\n二値アウトカムの人数")
 for variable in [
     "suicidal_ideation",
@@ -332,7 +390,11 @@ for variable in [
     )
 
 # 解析用データを保存
-df[["TTC_sex", exposure] + created_outcomes].to_csv(
+df[
+    ["TTC_sex", exposure, "care_labor_ave"]
+    + list(category_variables.values())
+    + created_outcomes
+].to_csv(
     analysis_data_output,
     index=False,
     encoding="utf-8-sig"
@@ -554,6 +616,156 @@ logistic_results_df.to_csv(
 )
 
 # ============================================================
+# カテゴリ化したcare_labor_totalによる線形・ロジスティック回帰
+# 最低群（Q1）がreference
+# ============================================================
+categorical_linear_results = []
+categorical_logistic_results = []
+category_summary_results = []
+
+for sex_group, group_df in analysis_groups:
+    for n_groups, category_variable in category_variables.items():
+
+        # 各カテゴリの人数とcare_labor_totalの範囲を保存
+        summary_data = group_df.dropna(subset=[category_variable])
+        for category_name, category_data in summary_data.groupby(
+            category_variable,
+            observed=True
+        ):
+            category_summary_results.append({
+                "TTC_sex": sex_group,
+                "Division": n_groups,
+                "Category_variable": category_variable,
+                "Category": str(category_name),
+                "N": len(category_data),
+                "Exposure_min": category_data[exposure].min(),
+                "Exposure_max": category_data[exposure].max(),
+                "Exposure_mean": category_data[exposure].mean()
+            })
+
+        for outcome in linear_outcomes:
+            model_data = group_df[[category_variable, outcome]].dropna().copy()
+            observed_categories = [
+                str(x) for x in model_data[category_variable]
+                .cat.remove_unused_categories().cat.categories
+            ]
+
+            if len(model_data) >= 3 and len(observed_categories) >= 2:
+                # drop_first=Trueにより最低群Q1をreferenceにする
+                dummy = pd.get_dummies(
+                    model_data[category_variable].cat.remove_unused_categories(),
+                    prefix=category_variable,
+                    drop_first=True,
+                    dtype=float
+                )
+                X = sm.add_constant(dummy, has_constant="add")
+                y = model_data[outcome]
+
+                try:
+                    model = sm.OLS(y, X).fit()
+                    omnibus_p = float(model.f_test(
+                        np.eye(len(dummy.columns), len(model.params), 1)
+                    ).pvalue)
+
+                    for column in dummy.columns:
+                        comparison = column.replace(
+                            f"{category_variable}_", ""
+                        )
+                        conf_int = model.conf_int().loc[column]
+                        categorical_linear_results.append({
+                            "TTC_sex": sex_group,
+                            "Outcome": outcome,
+                            "Division": n_groups,
+                            "Exposure": category_variable,
+                            "Reference": observed_categories[0],
+                            "Comparison": comparison,
+                            "N": int(model.nobs),
+                            "Beta": model.params[column],
+                            "SE": model.bse[column],
+                            "CI_95_lower": conf_int.iloc[0],
+                            "CI_95_upper": conf_int.iloc[1],
+                            "P_value": model.pvalues[column],
+                            "Omnibus_P_value": omnibus_p,
+                            "R_squared": model.rsquared
+                        })
+                except Exception as error:
+                    print(
+                        f"TTC_sex={sex_group}, {category_variable}, {outcome}の"
+                        f"線形回帰でエラーが発生しました：{error}"
+                    )
+
+        for outcome in logistic_outcomes:
+            model_data = group_df[[category_variable, outcome]].dropna().copy()
+            observed_categories = [
+                str(x) for x in model_data[category_variable]
+                .cat.remove_unused_categories().cat.categories
+            ]
+            event_n = int(model_data[outcome].eq(1).sum())
+            non_event_n = int(model_data[outcome].eq(0).sum())
+
+            can_fit = (
+                len(model_data) >= 3
+                and len(observed_categories) >= 2
+                and model_data[outcome].nunique() == 2
+            )
+
+            if can_fit:
+                dummy = pd.get_dummies(
+                    model_data[category_variable].cat.remove_unused_categories(),
+                    prefix=category_variable,
+                    drop_first=True,
+                    dtype=float
+                )
+                X = sm.add_constant(dummy, has_constant="add")
+                y = model_data[outcome].astype(int)
+
+                try:
+                    model = sm.Logit(y, X).fit(disp=False)
+
+                    for column in dummy.columns:
+                        comparison = column.replace(
+                            f"{category_variable}_", ""
+                        )
+                        beta = model.params[column]
+                        conf_int = model.conf_int().loc[column]
+                        categorical_logistic_results.append({
+                            "TTC_sex": sex_group,
+                            "Outcome": outcome,
+                            "Division": n_groups,
+                            "Exposure": category_variable,
+                            "Reference": observed_categories[0],
+                            "Comparison": comparison,
+                            "N": int(model.nobs),
+                            "Event_N": event_n,
+                            "Non_event_N": non_event_n,
+                            "OR": np.exp(beta),
+                            "OR_95CI_lower": np.exp(conf_int.iloc[0]),
+                            "OR_95CI_upper": np.exp(conf_int.iloc[1]),
+                            "P_value": model.pvalues[column],
+                            "Omnibus_P_value": model.llr_pvalue,
+                            "Converged": model.mle_retvals["converged"]
+                        })
+                except Exception as error:
+                    print(
+                        f"TTC_sex={sex_group}, {category_variable}, {outcome}の"
+                        f"ロジスティック回帰でエラーが発生しました：{error}"
+                    )
+
+categorical_linear_results_df = pd.DataFrame(categorical_linear_results)
+categorical_logistic_results_df = pd.DataFrame(categorical_logistic_results)
+category_summary_df = pd.DataFrame(category_summary_results)
+
+categorical_linear_results_df.to_csv(
+    categorical_linear_output, index=False, encoding="utf-8-sig"
+)
+categorical_logistic_results_df.to_csv(
+    categorical_logistic_output, index=False, encoding="utf-8-sig"
+)
+category_summary_df.to_csv(
+    category_summary_output, index=False, encoding="utf-8-sig"
+)
+
+# ============================================================
 # 結果の画面表示
 # ============================================================
 pd.set_option(
@@ -575,7 +787,20 @@ print(
     logistic_results_df.to_string(index=False)
 )
 
+print("\n================================================")
+print("カテゴリ化した曝露による線形回帰の結果（Q1がreference）")
+print("================================================")
+print(categorical_linear_results_df.to_string(index=False))
+
+print("\n================================================")
+print("カテゴリ化した曝露によるロジスティック回帰の結果（Q1がreference）")
+print("================================================")
+print(categorical_logistic_results_df.to_string(index=False))
+
 print("\n出力が完了しました。")
 print(f"解析用データ: {analysis_data_output}")
 print(f"線形回帰: {linear_output}")
 print(f"ロジスティック回帰: {logistic_output}")
+print(f"カテゴリ別人数・得点範囲: {category_summary_output}")
+print(f"カテゴリ線形回帰: {categorical_linear_output}")
+print(f"カテゴリロジスティック回帰: {categorical_logistic_output}")
