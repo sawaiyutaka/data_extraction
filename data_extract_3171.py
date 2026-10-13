@@ -16,7 +16,7 @@ XLS_GLOB = '*.xls*'
 # 結合のキー
 INDEX_COL = 'SAMPLENUMBER'
 # 出力
-OUTPUT = Path(r"D:\ttc_data_extract\output\sawai_260722.csv")  # ←ここに出力する時のファイル名を入れる
+OUTPUT = Path(r"D:\ttc_data_extract\output\sawai_pe_suicidal_261013.csv")  # ←ここに出力する時のファイル名を入れる
 
 
 # ===== ヘルパ =====
